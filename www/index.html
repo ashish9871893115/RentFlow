@@ -1,1 +1,77 @@
-
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RentFlow</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--tx:#14202b;--mu:#66727f;--pr:#0f766e;--prt:#fff;--ok:#15803d;--okb:#dcfce7;--bad:#b91c1c;--badb:#fee2e2;--wn:#a16207;--wnb:#fef3c7;--bd:#e3e8ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1419;--card:#18212a;--tx:#e8eef3;--mu:#93a1ae;--pr:#2dd4bf;--prt:#06201d;--ok:#4ade80;--okb:#14351f;--bad:#f87171;--badb:#3b1a1a;--wn:#fbbf24;--wnb:#3a2f10;--bd:#26323d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1419;--card:#18212a;--tx:#e8eef3;--mu:#93a1ae;--pr:#2dd4bf;--prt:#06201d;--ok:#4ade80;--okb:#14351f;--bad:#f87171;--badb:#3b1a1a;--wn:#fbbf24;--wnb:#3a2f10;--bd:#26323d;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;max-width:520px;margin:0 auto}
+header{padding:14px 16px 6px;font-weight:700;font-size:20px}header small{display:block;font-weight:400;color:var(--mu);font-size:12px}
+main{flex:1;overflow-y:auto;padding:8px 16px 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.grid .card{margin:0}.big{font-size:22px;font-weight:700}.mu{color:var(--mu);font-size:13px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chip{font-size:12px;padding:2px 9px;border-radius:99px;font-weight:600}
+.paid{background:var(--okb);color:var(--ok)}.due{background:var(--badb);color:var(--bad)}.soon{background:var(--wnb);color:var(--wn)}
+button{font:inherit;border:0;border-radius:10px;padding:9px 14px;background:var(--pr);color:var(--prt);font-weight:600}
+button.s{background:transparent;color:var(--pr);border:1px solid var(--pr);padding:6px 10px}
+button.w{width:100%}
+label{display:block;font-size:12px;color:var(--mu);margin:8px 0 2px}
+input,select{width:100%;font:inherit;padding:9px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+nav{display:flex;border-top:1px solid var(--bd);background:var(--card);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:10px 0;font-size:12px}
+nav button.on{color:var(--pr)}nav b{display:block;font-size:18px}
+h3{margin:14px 0 8px;font-size:15px}.note{font-size:12px;color:var(--mu);margin-top:8px}
+</style></head><body>
+<header id="hd"></header><main id="m"></main>
+<nav id="nv"></nav>
+<script>
+var T=[
+{id:1,n:"Amit Sharma",u:"Room 101",p:"Green View",r:12000,paid:12000,how:"UPI"},
+{id:2,n:"Priya Nair",u:"Room 102",p:"Green View",r:15000,paid:0},
+{id:3,n:"Rahul Verma",u:"Shop 1",p:"Green View",r:28000,paid:28000,how:"Bank"},
+{id:4,n:"Sunita Rao",u:"Flat 2A",p:"Sunrise Apts",r:22000,paid:10000,how:"Cash"},
+{id:5,n:"Karan Mehta",u:"Flat 2B",p:"Sunrise Apts",r:20000,paid:0}];
+var P=[{n:"Green View",units:6},{n:"Sunrise Apts",units:6}];
+var B=[{t:"Electricity",p:"Green View",amt:4250,due:"20 Nov 2026",units:330},{t:"Water",p:"Sunrise Apts",amt:900,due:"28 Nov 2026",units:0}];
+var tab="home",draft=null,scanning=false;
+var tabs=[["home","⌂","Home"],["prop","▦","Property"],["rent","₹","Rent"],["bills","⚡","Bills"],["me","☺","Profile"]];
+function f(x){return"₹"+x.toLocaleString("en-IN")}
+function sum(k){return T.reduce(function(a,t){return a+t[k]},0)}
+function st(t){return t.paid>=t.r?'<span class="chip paid">Paid</span>':t.paid>0?'<span class="chip soon">Partial</span>':'<span class="chip due">Pending</span>'}
+function home(){var tot=sum("r"),col=sum("paid"),exp=B.reduce(function(a,b){return a+b.amt},0);
+return'<div class="grid"><div class="card"><div class="mu">Monthly rent</div><div class="big">'+f(tot)+'</div></div><div class="card"><div class="mu">Collected</div><div class="big" style="color:var(--ok)">'+f(col)+'</div></div><div class="card"><div class="mu">Pending</div><div class="big" style="color:var(--bad)">'+f(tot-col)+'</div></div><div class="card"><div class="mu">Net income</div><div class="big">'+f(col-exp)+'</div></div></div>'
++'<div class="card"><div class="row"><span class="mu">Collection</span><b>'+Math.round(col/tot*100)+'%</b></div><div style="height:8px;border-radius:9px;background:var(--bd);margin-top:8px"><div style="height:8px;border-radius:9px;background:var(--pr);width:'+col/tot*100+'%"></div></div></div>'
++'<h3>Upcoming bills</h3>'+B.map(function(b){return'<div class="card row"><div><b>'+b.t+'</b><div class="mu">'+b.p+' · due '+b.due+'</div></div><b>'+f(b.amt)+'</b></div>'}).join("")}
+function prop(){return P.map(function(p){var ts=T.filter(function(t){return t.p==p.n});
+return'<div class="card"><div class="row"><b>'+p.n+'</b><span class="mu">'+ts.length+" of "+p.units+' occupied</span></div>'+ts.map(function(t){return'<div class="row mu" style="margin-top:6px"><span>'+t.u+" · "+t.n+'</span><span>'+f(t.r)+'</span></div>'}).join("")+'<div class="mu" style="margin-top:6px">'+(p.units-ts.length)+' vacant</div></div>'}).join("")}
+function rent(){return T.map(function(t){var bal=t.r-t.paid;
+return'<div class="card"><div class="row"><div><b>'+t.n+'</b><div class="mu">'+t.u+" · "+t.p+'</div></div>'+st(t)+'</div><div class="row" style="margin-top:8px"><span class="mu">Rent '+f(t.r)+" · Balance "+f(bal)+'</span></div>'
++(bal>0?'<div class="row" style="margin-top:8px;gap:6px"><button class="s" onclick="pay('+t.id+',\'Cash\')">Cash</button><button class="s" onclick="pay('+t.id+',\'UPI\')">UPI</button><button class="s" onclick="pay('+t.id+',\'Bank\')">Bank</button></div>':'<div class="mu" style="margin-top:6px">Received via '+t.how+" · receipt ready</div>")+'</div>'}).join("")+'<div class="note">Tap a method to record the full balance as received.</div>'}
+function pay(id,h){var t=T.filter(function(x){return x.id==id})[0];t.paid=t.r;t.how=h;draw()}
+function bills(){var h='<button class="w" onclick="document.getElementById(\'fi\').click()">Scan new bill</button><input id="fi" type="file" accept="image/*,application/pdf" capture="environment" hidden onchange="scan()">';
+if(scanning)h+='<div class="card" style="margin-top:12px">Reading bill…</div>';
+if(draft){var d=draft;h+='<div class="card" style="margin-top:12px"><b>Verify extracted details</b><div class="note">Demo values shown. A real build reads these from your photo with OCR/AI.</div>'
++'<label>Property</label><select id="bp">'+P.map(function(p){return"<option>"+p.n+"</option>"}).join("")+'</select>'
++'<label>Consumer number</label><input id="bc" value="'+d.c+'">'
++'<label>Previous reading</label><input id="b1" type="number" value="'+d.a+'" oninput="cu()">'
++'<label>Current reading</label><input id="b2" type="number" value="'+d.b+'" oninput="cu()">'
++'<div class="mu" style="margin-top:6px">Units consumed: <b id="bu">'+(d.b-d.a)+'</b></div>'
++'<label>Bill amount (₹)</label><input id="ba" type="number" value="'+d.m+'">'
++'<label>Due date</label><input id="bd" value="'+d.d+'">'
++'<div class="row" style="margin-top:12px;gap:8px"><button class="w" onclick="save()">Verify &amp; save</button><button class="s" onclick="draft=null;draw()">Cancel</button></div></div>'}
+return h+'<h3>Saved bills</h3>'+B.map(function(b){return'<div class="card row"><div><b>'+b.t+'</b><div class="mu">'+b.p+" · due "+b.due+(b.units?" · "+b.units+" units":"")+'</div></div><b>'+f(b.amt)+'</b></div>'}).join("")}
+function scan(){scanning=true;draw();setTimeout(function(){scanning=false;draft={c:"123456789",a:12450,b:12780,m:3850,d:"25 Nov 2026"};draw()},1200)}
+function cu(){document.getElementById("bu").textContent=(+document.getElementById("b2").value)-(+document.getElementById("b1").value)}
+function save(){var g=function(i){return document.getElementById(i).value};
+B.unshift({t:"Electricity",p:g("bp"),amt:+g("ba"),due:g("bd"),units:(+g("b2"))-(+g("b1"))});draft=null;draw()}
+function me(){return'<div class="card"><b>Landlord account</b><div class="mu">Plan: Free · 1 property limit (demo)</div></div><div class="card"><b>Reminders</b><div class="mu">Rent due, overdue and bill reminders via WhatsApp/SMS are planned for the full app.</div></div><div class="card"><b>Reports</b><div class="mu">Monthly PDF/Excel exports are planned for the full app.</div></div><div class="note">RentFlow prototype with sample data. Changes reset when you reload.</div>'}
+function draw(){var v={home:home,prop:prop,rent:rent,bills:bills,me:me};
+document.getElementById("hd").innerHTML="RentFlow<small>"+tabs.filter(function(x){return x[0]==tab})[0][2]+" · Nov 2026</small>";
+document.getElementById("m").innerHTML=v[tab]();
+document.getElementById("nv").innerHTML=tabs.map(function(x){return'<button class="'+(x[0]==tab?"on":"")+'" onclick="tab=\''+x[0]+'\';draw()"><b>'+x[1]+"</b>"+x[2]+"</button>"}).join("")}
+draw();
+</script></body></html>
